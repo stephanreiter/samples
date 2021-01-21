@@ -28,13 +28,9 @@ let preferredVideoCodecMimeType = undefined;
 function VideoPipe(stream, forceSend, forceReceive, handler) {
   this.pc1 = new RTCPeerConnection({
     encodedInsertableStreams: forceSend,
-    forceEncodedVideoInsertableStreams: forceSend, // legacy, to be removed in M85.
-    forceEncodedAudioInsertableStreams: forceSend, // legacy, to be removed in M85.
   });
   this.pc2 = new RTCPeerConnection({
     encodedInsertableStreams: forceReceive,
-    forceEncodedVideoInsertableStreams: forceReceive, // legacy, to be removed in M85.
-    forceEncodedAudioInsertableStreams: forceReceive, // legacy, to be removed in M85.
   });
 
   stream.getTracks().forEach((track) => this.pc1.addTrack(track, stream));
@@ -43,7 +39,7 @@ function VideoPipe(stream, forceSend, forceReceive, handler) {
     const {codecs} = RTCRtpSender.getCapabilities('video');
     const selectedCodecIndex = codecs.findIndex(c => c.mimeType === preferredVideoCodecMimeType);
     const selectedCodec = codecs[selectedCodecIndex];
-    codecs.slice(selectedCodecIndex, 1);
+    codecs.splice(selectedCodecIndex, 1);
     codecs.unshift(selectedCodec);
     const transceiver = this.pc1.getTransceivers().find(t => t.sender && t.sender.track === stream.getVideoTracks()[0]);
     transceiver.setCodecPreferences(codecs);
